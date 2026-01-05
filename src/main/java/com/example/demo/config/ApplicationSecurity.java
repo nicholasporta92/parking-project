@@ -9,7 +9,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -43,6 +47,13 @@ public class ApplicationSecurity {
                         .requestMatchers("/api/utente/registrazione", "/api/utente/login").permitAll()
                         .requestMatchers("/api/parkingLot/**").permitAll()
                         .requestMatchers("/api/appointment/**").permitAll()
+                         // Swagger / OpenAPI
+                        .requestMatchers(
+                            "/swagger-ui.html",
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/v3/api-docs.yaml"
+                        ).permitAll()
                         .requestMatchers("/admin/**").hasRole("AMMINISTRATORE")
                         .requestMatchers("/user/**").hasAnyRole("AMMINISTRATORE", "UTENTE")
                         .anyRequest().authenticated()
@@ -85,22 +96,22 @@ public class ApplicationSecurity {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-//    @Bean
-//    public UserDetailsService users() {
-//        UserDetails admin = User
-//                .withUsername("admin")
-//                .password(passwordEncoder().encode("adminpass"))
-//                .roles("AMMINISTRATORE")
-//                .build();
-//
-//        UserDetails user = User
-//                .withUsername("user")
-//                .password(passwordEncoder().encode("userpass"))
-//                .roles("UTENTE")
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(admin, user);
-//    }
+   @Bean
+   public UserDetailsService users() {
+       UserDetails admin = User
+               .withUsername("admin")
+               .password(passwordEncoder().encode("adminpass"))
+               .roles("AMMINISTRATORE")
+               .build();
+
+       UserDetails user = User
+               .withUsername("user")
+               .password(passwordEncoder().encode("userpass"))
+               .roles("UTENTE")
+               .build();
+
+       return new InMemoryUserDetailsManager(admin, user);
+   }
 
 
 }
